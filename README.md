@@ -16,7 +16,10 @@ patrón Repositorio, Strategy para reglas de negocio e inyección de dependencia
 │   ├── 04-arquitectura.md        Capas, escalabilidad, seguridad y API
 │   └── 05-presentacion.md        Guion de presentación (15 min)
 ├── informe/
-│   └── informe.html              Informe técnico listo para exportar a PDF
+│   ├── informe-cafe-express.docx   Informe técnico en Word (formato APA 7, 9 páginas)
+│   ├── informe-cafe-express.html   Versión web del informe (Ctrl+P → PDF)
+│   ├── informe-cafe-express.rtf    Versión RTF equivalente
+│   └── img/                        Diagramas UML renderizados (SVG/PNG)
 ├── src/cafeexpress/
 │   ├── App.java                  Composición del sistema (inyección de dependencias)
 │   ├── controller/               Capa controladora HTTP (MVC)
@@ -56,4 +59,6 @@ balanceador de carga (escalabilidad horizontal).
 
 ## Documentación completa
 
-Ver `docs/` y `informe/informe.html` (abrir en el navegador → Ctrl+P → guardar como PDF).
+Ver `docs/` (fuentes Markdown con diagramas Mermaid) y `informe/informe-cafe-express.docx`
+(informe técnico en formato APA 7.ª ed.: portada, resumen, introducción, requisitos, UML,
+patrones, prototipo, conclusiones y referencias).

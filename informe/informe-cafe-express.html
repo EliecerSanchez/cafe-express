@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Informe Técnico APA — Café Express</title>
+<style>
+    @page { size: A4; margin: 2cm; }
+    * { box-sizing: border-box; }
+    body { font-family: Georgia, "Times New Roman", serif; color: #1a1a1a; line-height: 1.55;
+           max-width: 21cm; margin: 0 auto; padding: 24px; background: #fff; }
+    h1, h2, h3 { font-family: "Segoe UI", Arial, sans-serif; color: #3e2723; }
+    h2 { border-bottom: 2px solid #c89f65; padding-bottom: 4px; margin-top: 34px; page-break-after: avoid; }
+    h3 { margin-top: 22px; page-break-after: avoid; }
+    p { text-align: justify; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 12px 0; }
+    th, td { border: 1px solid #b9a58e; padding: 6px 8px; text-align: left; vertical-align: top; }
+    th { background: #f0e6d8; font-family: "Segoe UI", Arial, sans-serif; }
+    code, pre { font-family: Consolas, monospace; font-size: 12px; background: #f7f3ee; }
+    pre { padding: 10px; border-radius: 6px; overflow-x: auto; border: 1px solid #e4d8c8; }
+    figure { text-align: center; page-break-inside: avoid; margin: 16px 0; }
+    figure img { max-width: 100%; height: auto; border: 1px solid #e4d8c8; background: #fff; }
+    .pie { font-size: 12px; color: #6b5b4d; text-align: center; font-style: italic; }
+    .portada { text-align: center; page-break-after: always; }
+    .portada h1 { font-size: 34px; margin: 8px 0; }
+    .portada .logo { font-size: 64px; }
+    .portada .sub { font-size: 17px; color: #5d4037; }
+    .portada .datos { margin-top: 70px; font-size: 15px; line-height: 1.9; }
+    .referencia { padding-left: 36px; text-indent: -36px; margin: 10px 0; font-size: 14px; text-align: left; }
+    .nota { background: #f7f3ee; border-left: 4px solid #c89f65; padding: 8px 12px; font-size: 13px; }
+    ul li { margin-bottom: 4px; }
+    @media print { body { padding: 0; } }
+</style>
+</head>
+<body>
+
+<section class="portada" style="padding-top:140px">
+    <div class="logo">&#9749;</div>
+    <p class="sub">Institución Universitaria Tecnológica del Oriente</p>
+    <h1>Café Express</h1>
+    <p class="sub">Arquitectura de un sistema web para la gestión de pedidos de una cafetería</p>
+    <p class="sub">Informe técnico — Unidad 1 · Actividad 2</p>
+    <div class="datos">
+        <p><strong>Asignatura:</strong> Arquitectura de Software — 20262, Nivel 5, Grupo B</p>
+        <p><strong>Docente:</strong> Edward Alfonso Villamizar Vallejo</p>
+        <p><strong>Integrantes:</strong> [Nombre 1] · [Nombre 2] · [Nombre 3]</p>
+        <p><strong>Fecha:</strong> Agosto de 2026</p>
+    </div>
+</section>
+<h2>1. Introducción</h2>
+<p><strong>Café Express</strong> es una cafetería que registra sus pedidos de forma manual, lo que genera
+errores de transcripción, pérdida de comprobantes y desconocimiento, por parte del cliente, del estado de
+su pedido. Este documento presenta el diseño arquitectónico y el prototipo funcional de un sistema web
+pequeño para gestionar dichos pedidos.</p>
+<p>El trabajo siguió seis pasos: (1) análisis de requisitos funcionales y no funcionales; (2) diseño
+arquitectónico mediante cuatro diagramas UML; (3) investigación y selección de patrones de diseño,
+incluyendo su pertinencia en entornos de computación en la nube; (4) construcción de un prototipo
+funcional que evidencia los patrones seleccionados; (5) preparación de la presentación; y (6) este informe.</p>
+<p>La decisión central de arquitectura es la <strong>separación de responsabilidades</strong>: una
+arquitectura por capas bajo el esquema Modelo-Vista-Controlador, donde cada componente tiene una única
+responsabilidad y se comunica solo con las capas adyacentes. Esta decisión responde simultáneamente a los
+requisitos no funcionales del sistema: facilidad de uso, protección de la información, mantenibilidad,
+extensibilidad y escalabilidad.</p>
+
+<h2>2. Análisis de requisitos</h2>
+<h3>2.1 Técnica de análisis</h3>
+<p>Se aplicó la observación del proceso actual (pedidos en papel) junto con la técnica de eventos y
+actores: identificados los actores (cliente y administrador), se listaron los eventos del negocio que
+ellos disparan y de cada evento se derivó un requisito funcional.</p>
+
+<h3>2.2 Requisitos funcionales (tabla 1)</h3>
+<table>
+<tr><th>ID</th><th>Requisito</th><th>Actor</th><th>Descripción</th></tr>
+<tr><td>RF-01</td><td>Consultar los productos</td><td>Cliente</td>
+<td>Catálogo con nombre, categoría, precio y disponibilidad.</td></tr>
+<tr><td>RF-02</td><td>Realizar los pedidos</td><td>Cliente</td>
+<td>Selecciona productos y cantidades, indica nombre y forma de pago; el sistema valida reglas y registra.</td></tr>
+<tr><td>RF-03</td><td>Consultar el estado del pedido</td><td>Cliente</td>
+<td>Con el número de pedido consulta estado, detalle y totales.</td></tr>
+<tr><td>RF-04</td><td>Consultar los pedidos</td><td>Administrador</td>
+<td>Lista todos los pedidos con cliente, estado y valores.</td></tr>
+<tr><td>RF-05</td><td>Actualizar el estado del pedido</td><td>Administrador</td>
+<td>Solo transiciones válidas: RECIBIDO → EN_PREPARACION → LISTO → ENTREGADO o CANCELADO.</td></tr>
+<tr><td>RF-06</td><td>Gestionar productos</td><td>Administrador</td>
+<td>Crear, editar precio, habilitar/deshabilitar y eliminar productos.</td></tr>
+</table>
+
+<h3>2.3 Requisitos no funcionales (tabla 2)</h3>
+<table>
+<tr><th>ID</th><th>Requisito</th><th>Decisión arquitectónica que lo satisface</th></tr>
+<tr><td>RNF-01</td><td>Fácil de utilizar</td>
+<td>Interfaz web de una sola página con tres pestañas (Menú, Mi pedido, Administración); API REST coherente.</td></tr>
+<tr><td>RNF-02</td><td>Proteger la información</td>
+<td>Verificación de credenciales en un único punto (controladores) con token X-Admin-Token;
+evolución prevista hacia Identity Server (OAuth2/JWT).</td></tr>
+<tr><td>RNF-03</td><td>Fácil de mantener</td>
+<td>Capas MVC + patrón Repositorio: módulos pequeños con responsabilidad única.</td></tr>
+<tr><td>RNF-04</td><td>Agregar funcionalidades</td>
+<td>Interfaces e inyección de dependencias: nuevos comportamientos sin reescribir código existente.</td></tr>
+<tr><td>RNF-05</td><td>Escalabilidad</td>
+<td>Contenedor Docker sin dependencias nativas: escala verticalmente (más recursos al nodo)
+u horizontalmente (réplicas/pods detrás de balanceador de carga).</td></tr>
+</table>
+<h2>3. Diseño de la arquitectura mediante UML</h2>
+<p>Los diagramas están pre-renderizados como imágenes (carpeta <code>informe/img/</code>);
+las fuentes editables en sintaxis Mermaid permanecen en <code>docs/02-diagramas-uml.md</code>.</p>
+
+<h3>3.1 Diagrama de casos de uso</h3>
+<figure><img src="img/fig1-casos-uso.png" alt="Diagrama de casos de uso"></figure>
+<p class="pie">Figura 1. Casos de uso del sistema Café Express.</p>
+<p><strong>Descripción:</strong> el cliente consulta el catálogo, realiza pedidos y consulta su estado;
+el administrador consulta/actualiza pedidos y gestiona productos; los casos de escritura incluyen la
+validación de reglas de negocio.</p>
+<p><strong>Justificación:</strong> define la frontera del sistema y sus actores antes de diseñar; de él
+se derivan los módulos de presentación y los endpoints REST, dando trazabilidad entre requisitos y componentes.</p>
+
+<h3>3.2 Diagrama de clases</h3>
+<figure><img src="img/fig2-clases.png" alt="Diagrama de clases"></figure>
+<p class="pie">Figura 2. Diagrama de clases: dominio, servicios e interfaces de repositorio.</p>
+<p><strong>Descripción:</strong> <em>Pedido</em> agrega uno o más <em>DetallePedido</em> que referencian
+un <em>Producto</em>; la lógica vive en los servicios; el acceso a datos queda detrás de interfaces;
+la regla de descuento se encapsula en una estrategia intercambiable.</p>
+<p><strong>Justificación:</strong> evidencia la separación de responsabilidades y el desacoplamiento:
+cambiar el almacenamiento solo exige otra implementación del repositorio, sin tocar servicios ni controladores.</p>
+
+<h3>3.3 Diagrama de secuencia — realizar pedido</h3>
+<figure><img src="img/fig3-secuencia.png" alt="Diagrama de secuencia"></figure>
+<p class="pie">Figura 3. Secuencia del caso de uso «Realizar pedido».</p>
+<p><strong>Descripción:</strong> recorre el flujo desde la acción del usuario hasta la persistencia
+y la notificación de confirmación.</p>
+<p><strong>Justificación:</strong> demuestra que cada mensaje cruza una sola frontera por capa; si una
+regla falla, el servicio responde y el controlador lo traduce a HTTP 422 — la interfaz nunca accede
+directamente a los datos.</p>
+
+<h3>3.4 Diagrama de despliegue</h3>
+<figure><img src="img/fig4-despliegue.png" alt="Diagrama de despliegue"></figure>
+<p class="pie">Figura 4. Despliegue en la nube con réplicas horizontales (pods).</p>
+<p><strong>Descripción:</strong> el navegador ejecuta la vista; el balanceador de la plataforma distribuye
+las peticiones HTTPS entre réplicas idénticas; cada réplica accede a su almacén de datos.</p>
+<p><strong>Justificación:</strong> documenta dónde se ejecuta cada componente y cómo crece el sistema:
+horizontal = agregar pods sin reconstruir nada; vertical = más RAM/CPU al nodo. Al ser un JAR sin
+dependencias nativas, la misma imagen corre igual en local o en la nube.</p>
+<h2>4. Patrones de diseño seleccionados</h2>
+<p>Se investigaron los catálogos clásicos (Gamma et al., 1994; Fowler, 2002) y los patrones para la nube
+(Microsoft, 2024). La selección y los descartes se justifican a continuación.</p>
+<table>
+<tr><th>Patrón</th><th>Decisión</th><th>Justificación</th></tr>
+<tr><td>MVC (capas)</td><td><strong>Seleccionado</strong></td>
+<td>Vista, controladores y modelo/servicio separados; responde a RNF-03 y evita el antipatrón de
+lógica, interfaz y datos mezclados en un solo bloque.</td></tr>
+<tr><td>Repository</td><td><strong>Seleccionado</strong></td>
+<td>Los servicios ignoran dónde están los datos; migrar a SQL en la nube exige solo otra implementación.</td></tr>
+<tr><td>Strategy</td><td><strong>Seleccionado</strong></td>
+<td>PoliticaDescuento encapsula la regla del 10 % sobre $200.000; nuevas promociones se agregan sin modificar PedidoService.</td></tr>
+<tr><td>Inyección de dependencias</td><td><strong>Seleccionado</strong></td>
+<td>App compone repositorios → servicios → controladores por constructor: bajo acoplamiento y punto único de composición.</td></tr>
+<tr><td>Singleton</td><td>Descartado</td>
+<td>Estado global difícil de probar; el efecto se logra inyectando un repositorio único desde App.</td></tr>
+<tr><td>API Gateway / BFF</td><td>Diferido</td>
+<td>Pertinente con varios microservicios; sobreingeniería para un módulo único.</td></tr>
+<tr><td>Circuit Breaker</td><td>Diferido</td>
+<td>Aplica ante dependencias externas que pueden fallar; aún no existen.</td></tr>
+<tr><td>CQRS</td><td>Diferido</td>
+<td>Útil a gran volumen; duplicaría esfuerzo a esta escala.</td></tr>
+</table>
+
+<h2>5. Prototipo funcional</h2>
+<h3>5.1 Tecnología y estructura</h3>
+<p>Java 26 puro con el servidor HTTP integrado del JDK, sin Maven ni librerías externas; vista SPA con
+HTML/CSS/JS vanilla; almacenamiento en memoria sembrado con el catálogo. La estructura refleja la arquitectura:
+<code>controller/</code> (MVC), <code>service/</code> (reglas + Strategy), <code>repository/</code>
+(interfaces + implementación en memoria), <code>domain/</code> (entidades), <code>static/</code> (vista)
+y <code>App.java</code> (composición e inyección de dependencias).</p>
+
+<h3>5.2 Reglas de negocio evidenciadas</h3>
+<ul>
+<li>Descuento automático del <strong>10 %</strong> cuando el subtotal es ≥ <strong>$200.000</strong>
+(verificado: $220.000 → descuento $22.000 → total $198.000).</li>
+<li>Pagos con <strong>tarjeta solo desde $5.000</strong>: pedidos menores se rechazan con HTTP 422.</li>
+<li>Ciclo de vida con transiciones válidas: RECIBIDO → ENTREGADO se rechaza; RECIBIDO → EN_PREPARACION se acepta.</li>
+<li>Operaciones administrativas protegidas: sin token responden HTTP 401.</li>
+</ul>
+
+<h3>5.3 Ejecución</h3>
+<pre># Local (solo JDK):
+javac -encoding UTF-8 -d bin (Get-ChildItem -Recurse src -Filter *.java).FullName
+java -cp bin cafeexpress.App           # http://localhost:8080
+
+# Contenedor (nube):
+docker build -t cafe-express .
+docker run -p 8080:8080 cafe-express</pre>
+<p class="nota">Token de administración demostrativo: admin123. En producción se sustituiría por un
+Identity Server (OAuth2/JWT) sin tocar la lógica de negocio.</p>
+
+<h2>6. Conclusiones</h2>
+<ul>
+<li>La separación de responsabilidades satisface simultáneamente los requisitos no funcionales:
+mantenibilidad, extensibilidad y protección de la información.</li>
+<li>El patrón Repositorio desacopla la persistencia: migrar a base administrada en la nube no reescribe la lógica.</li>
+<li>La arquitectura escala verticalmente potenciando el nodo y horizontalmente replicando contenedores idénticos
+(pods) detrás de un balanceador, sin reconstruir el sistema.</li>
+<li>Los patrones descartados quedan documentados con su criterio de activación: el diseño es una hoja de ruta evolutiva.</li>
+</ul>
+
+<h2>Referencias</h2>
+<p class="referencia">Bass, L., Clements, P., &amp; Kazman, R. (2012). <em>Software architecture in practice</em> (3.ª ed.). Addison-Wesley.</p>
+<p class="referencia">Fowler, M. (2002). <em>Patterns of enterprise application architecture</em>. Addison-Wesley.</p>
+<p class="referencia">Gamma, E., Helm, R., Johnson, R., &amp; Vlissides, J. (1994). <em>Design patterns: Elements of reusable object-oriented software</em>. Addison-Wesley.</p>
+<p class="referencia">Microsoft. (2024). <em>Cloud design patterns</em>. https://learn.microsoft.com/azure/architecture/patterns/</p>
+<p class="referencia">Sommerville, I. (2011). <em>Ingeniería de software</em> (9.ª ed.). Pearson Educación.</p>
+</body>
+</html>
