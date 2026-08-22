@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Café Express - Gestión de Pedidos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="cabecera">
+    <div class="marca">
+        <span class="logo">&#9749;</span>
+        <div>
+            <h1>Caf&eacute; Express</h1>
+            <p>Sistema web de gesti&oacute;n de pedidos</p>
+        </div>
+    </div>
+    <nav class="pestanas">
+        <button class="pestana activa" data-vista="menu">Men&uacute;</button>
+        <button class="pestana" data-vista="pedido">Mi pedido</button>
+        <button class="pestana" data-vista="admin">Administraci&oacute;n</button>
+    </nav>
+</header>
+
+<main>
+    <section id="vista-menu" class="vista visible">
+        <div class="columnas">
+            <div class="productos" id="lista-productos"></div>
+            <aside class="carrito">
+                <h2>Tu pedido</h2>
+                <ul id="carrito-lista"><li class="vacio">A&uacute;n no agregas productos.</li></ul>
+                <div class="totales">
+                    <span>Subtotal</span><span id="carrito-subtotal">$0</span>
+                    <span>Descuento</span><span id="carrito-descuento">$0</span>
+                    <strong>Total</strong><strong class="total" id="carrito-total">$0</strong>
+                </div>
+                <label for="cliente">Nombre del cliente</label>
+                <input id="cliente" type="text" placeholder="Ej: Mar&iacute;a P&eacute;rez">
+                <label for="forma-pago">Forma de pago</label>
+                <select id="forma-pago">
+                    <option value="EFECTIVO">Efectivo</option>
+                    <option value="TARJETA">Tarjeta (pedidos desde $5.000)</option>
+                </select>
+                <button class="primario" id="btn-realizar">Realizar pedido</button>
+                <p class="mensaje oculto" id="mensaje-pedido"></p>
+                <p class="error" id="error-pedido"></p>
+            </aside>
+        </div>
+    </section>
+
+    <section id="vista-pedido" class="vista">
+        <div class="consulta">
+            <h2>Consultar estado del pedido</h2>
+            <div class="fila">
+                <label for="numero-pedido">N&uacute;mero de pedido
+                    <input id="numero-pedido" type="number" min="1" placeholder="101">
+                </label>
+                <button class="primario" id="btn-consultar">Consultar</button>
+            </div>
+            <p class="error" id="error-consulta"></p>
+        </div>
+        <div id="resultado-pedido" class="oculto">
+            <div class="linea-tiempo" id="linea-tiempo"></div>
+            <div class="resumen" id="resumen-pedido"></div>
+        </div>
+    </section>
+
+    <section id="vista-admin" class="vista">
+        <div class="consulta">
+            <h2>Acceso administrador</h2>
+            <div class="fila">
+                <label for="token-admin">Token
+                    <input id="token-admin" type="password" placeholder="admin123">
+                </label>
+                <button class="primario" id="btn-conectar">Entrar</button>
+            </div>
+            <p class="ayuda">Prototipo acad&eacute;mico: token demostrativo. En producci&oacute;n se integrar&iacute;a un Identity Server (OAuth2 / JWT).</p>
+            <p class="error" id="error-admin"></p>
+        </div>
+
+        <div id="panel-admin" class="oculto">
+            <div class="panel">
+                <h2>Gesti&oacute;n de productos <button class="secundario" id="btn-refrescar-productos">Refrescar</button></h2>
+                <form class="fila formulario-producto" id="form-producto">
+                    <input type="hidden" id="prod-id">
+                    <label>Nombre<input id="prod-nombre" required></label>
+                    <label>Categor&iacute;a<input id="prod-categoria" placeholder="Bebidas calientes"></label>
+                    <label>Precio<input id="prod-precio" type="number" min="1" step="100" required></label>
+                    <button class="primario" type="submit">Guardar</button>
+                    <button class="mini oculto" type="button" id="btn-cancelar-edicion">Cancelar edici&oacute;n</button>
+                </form>
+                <table class="tabla" id="tabla-productos"></table>
+            </div>
+
+            <div class="panel">
+                <h2>Pedidos recibidos <button class="secundario" id="btn-refrescar-pedidos">Refrescar</button></h2>
+                <table class="tabla" id="tabla-pedidos"></table>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>Caf&eacute; Express &middot; Prototipo de arquitectura en capas (Unidad 1 - Actividad 2) &middot; Arquitectura de Software</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
