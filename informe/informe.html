@@ -149,18 +149,76 @@ requisitos y componentes.</p>
 <h3>3.2 Diagrama de clases</h3>
 <div class="mermaid">
 classDiagram
-    class Cliente { +String nombre }
-    class Producto { +int id +String nombre +String categoria +double precio +boolean disponible }
-    class Pedido { +int id +String cliente +LocalDateTime fecha +EstadoPedido estado +FormaPago formaPago +agregarDetalle(d) +aplicarDescuento(v) +getTotal() double }
-    class DetallePedido { +int productoId +String nombreProducto +double precioUnitario +int cantidad +getSubtotal() double }
-    class EstadoPedido { <<enumeration>> RECIBIDO EN_PREPARACION LISTO ENTREGADO CANCELADO }
-    class FormaPago { <<enumeration>> EFECTIVO TARJETA }
-    class PedidoService { -PoliticaDescuento politica +crear(cliente, formaPago, items) Pedido +cambiarEstado(id, estado) Pedido }
-    class ProductoService { +listarDisponibles() List +crear(n, c, p) Producto }
-    class PoliticaDescuento { <<interface>> +calcular(subtotal) double }
-    class DescuentoPorMonto { +MONTO_MINIMO = 200000 +PORCENTAJE = 0.10 }
-    class PedidoRepository { <<interface>> +guardar(p) Pedido +buscarPorId(id) Optional +listar() List }
-    class ProductoRepository { <<interface>> +guardar(p) Producto +eliminar(id) boolean }
+    class Cliente {
+        +String nombre
+    }
+    class Producto {
+        +int id
+        +String nombre
+        +String categoria
+        +double precio
+        +boolean disponible
+    }
+    class Pedido {
+        +int id
+        +String cliente
+        +LocalDateTime fecha
+        +EstadoPedido estado
+        +FormaPago formaPago
+        +agregarDetalle(detalle)
+        +aplicarDescuento(valor)
+        +getSubtotal() double
+        +getTotal() double
+    }
+    class DetallePedido {
+        +int productoId
+        +String nombreProducto
+        +double precioUnitario
+        +int cantidad
+        +getSubtotal() double
+    }
+    class EstadoPedido {
+        <<enumeration>>
+        RECIBIDO
+        EN_PREPARACION
+        LISTO
+        ENTREGADO
+        CANCELADO
+    }
+    class FormaPago {
+        <<enumeration>>
+        EFECTIVO
+        TARJETA
+    }
+    class PedidoService {
+        -PoliticaDescuento politicaDescuento
+        +crear() Pedido
+        +cambiarEstado() Pedido
+        +obtener() Pedido
+    }
+    class ProductoService {
+        +listarDisponibles() List
+        +crear() Producto
+    }
+    class PoliticaDescuento {
+        <<interface>>
+        +calcular(subtotal) double
+    }
+    class DescuentoPorMonto {
+        +MONTO_MINIMO double
+        +PORCENTAJE double
+    }
+    class PedidoRepository {
+        <<interface>>
+        +guardar(pedido) Pedido
+        +buscarPorId(id) Optional
+        +listar() List
+    }
+    class ProductoRepository {
+        <<interface>>
+        +guardar(producto) Producto
+        +eliminar(id) boolean
+    }
     class EnMemoriaPedidoRepository
     class EnMemoriaProductoRepository
 

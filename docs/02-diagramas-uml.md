@@ -83,26 +83,26 @@ classDiagram
         TARJETA
     }
     class PedidoService {
-        -PoliticaDescuento politica
-        +crear(cliente, formaPago, items) Pedido
-        +cambiarEstado(id, estado) Pedido
-        +obtener(id) Pedido
+        -PoliticaDescuento politicaDescuento
+        +crear() Pedido
+        +cambiarEstado() Pedido
+        +obtener() Pedido
     }
     class ProductoService {
         +listarDisponibles() List
-        +crear(nombre, cat, precio) Producto
+        +crear() Producto
     }
     class PoliticaDescuento {
         <<interface>>
         +calcular(subtotal) double
     }
     class DescuentoPorMonto {
-        +MONTO_MINIMO = 200000
-        +PORCENTAJE = 0.10
+        +MONTO_MINIMO double
+        +PORCENTAJE double
     }
     class PedidoRepository {
         <<interface>>
-        +guardar(p) Pedido
+        +guardar(pedido) Pedido
         +buscarPorId(id) Optional
         +listar() List
     }
