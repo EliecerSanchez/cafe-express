@@ -8,6 +8,7 @@ patrón Repositorio, Strategy para reglas de negocio e inyección de dependencia
 
 ```
 ├── README.md                     Este archivo
+├── cafe-express.jar              JAR ejecutable (java -jar)
 ├── Dockerfile                    Empaquetado para despliegue en la nube
 ├── docs/
 │   ├── 01-analisis-requisitos.md RF / RNF + técnica de análisis + trazabilidad
@@ -31,11 +32,29 @@ patrón Repositorio, Strategy para reglas de negocio e inyección de dependencia
 └── static/                       Vista: interfaz web SPA (HTML/CSS/JS vanilla)
 ```
 
-## Ejecución local (solo JDK, sin Maven/Gradle)
+## Ejecución local
+
+**Opción rápida — JAR ejecutable (solo necesita JDK instalado):**
+
+```powershell
+java -jar cafe-express.jar
+```
+
+**Opción completa — compilar desde el código fuente:**
 
 ```powershell
 javac -encoding UTF-8 -d bin (Get-ChildItem -Recurse src -Filter *.java).FullName
 java -cp bin cafeexpress.App
+```
+
+**Recompilar el JAR desde el código fuente:**
+
+```powershell
+javac -encoding UTF-8 -d bin (Get-ChildItem -Recurse src -Filter *.java).FullName
+New-Item -ItemType Directory -Force META-INF | Out-Null
+Set-Content -Path META-INF\MANIFEST.MF -Value "Manifest-Version: 1.0`nMain-Class: cafeexpress.App`n" -NoNewline
+jar cfm cafe-express.jar META-INF\MANIFEST.MF -C bin .
+Remove-Item -Recurse -Force bin, META-INF
 ```
 
 Abrir http://localhost:8080 — token de administración demostrativo: `admin123`.
