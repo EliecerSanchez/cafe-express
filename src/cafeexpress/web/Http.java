@@ -2,9 +2,12 @@ package cafeexpress.web;
 
 import com.sun.net.httpserver.HttpExchange;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Map;
 
 public final class Http {
@@ -28,7 +31,7 @@ public final class Http {
     }
 
     public static void error(HttpExchange exchange, int codigo, String mensaje) throws IOException {
-        json(exchange, codigo, SimpleJson.de(Map.of("error", mensaje)));
+        json(exchange, codigo, SimpleJson.de(Collections.singletonMap("error", mensaje)));
     }
 
     public static void creado(HttpExchange exchange, Object datos) throws IOException {
@@ -36,7 +39,14 @@ public final class Http {
     }
 
     public static String leerCuerpo(HttpExchange exchange) throws IOException {
-        return new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        InputStream is = exchange.getRequestBody();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        byte[] data = new byte[1024];
+        int nRead;
+        while ((nRead = is.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        return buffer.toString("UTF-8");
     }
 
     public static boolean esAdmin(HttpExchange exchange) {

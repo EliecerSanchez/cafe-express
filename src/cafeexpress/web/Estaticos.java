@@ -17,7 +17,7 @@ public class Estaticos implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String ruta = exchange.getRequestURI().getPath();
-        if (ruta.equals("/") || ruta.isBlank()) ruta = "/index.html";
+        if (ruta.equals("/") || ruta.trim().isEmpty()) ruta = "/index.html";
         Path archivo = raiz.resolve(ruta.substring(1)).normalize();
 
         if (!archivo.startsWith(raiz) || !Files.isRegularFile(archivo)) {

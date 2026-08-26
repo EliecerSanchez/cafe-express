@@ -24,11 +24,12 @@ public final class SimpleJson {
     private static void escribir(Object valor, StringBuilder sb) {
         if (valor == null) {
             sb.append("null");
-        } else if (valor instanceof String s) {
-            escribirTexto(s, sb);
-        } else if (valor instanceof Boolean b) {
-            sb.append(b);
-        } else if (valor instanceof Double d) {
+        } else if (valor instanceof String) {
+            escribirTexto((String) valor, sb);
+        } else if (valor instanceof Boolean) {
+            sb.append((Boolean) valor);
+        } else if (valor instanceof Double) {
+            Double d = (Double) valor;
             if (d.isNaN() || d.isInfinite()) {
                 sb.append("null");
             } else if (d == Math.floor(d)) {
@@ -36,14 +37,14 @@ public final class SimpleJson {
             } else {
                 sb.append(d);
             }
-        } else if (valor instanceof Number n) {
-            sb.append(n);
-        } else if (valor instanceof Enum<?> e) {
-            escribirTexto(e.name(), sb);
-        } else if (valor instanceof Map<?, ?> mapa) {
-            escribirMapa(mapa, sb);
-        } else if (valor instanceof List<?> lista) {
-            escribirLista(lista, sb);
+        } else if (valor instanceof Number) {
+            sb.append((Number) valor);
+        } else if (valor instanceof Enum) {
+            escribirTexto(((Enum<?>) valor).name(), sb);
+        } else if (valor instanceof Map) {
+            escribirMapa((Map<?, ?>) valor, sb);
+        } else if (valor instanceof List) {
+            escribirLista((List<?>) valor, sb);
         } else {
             escribirTexto(valor.toString(), sb);
         }
@@ -75,20 +76,31 @@ public final class SimpleJson {
 
     private static void escribirTexto(String texto, StringBuilder sb) {
         sb.append('"');
-        for (char c : texto.toCharArray()) {
+        for (int i = 0; i < texto.length(); i++) {
+            char c = texto.charAt(i);
             switch (c) {
-                case '"' -> sb.append("\\\"");
-                case '\\' -> sb.append("\\\\");
-                case '\n' -> sb.append("\\n");
-                case '\r' -> sb.append("\\r");
-                case '\t' -> sb.append("\\t");
-                default -> {
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
                     if (c < 0x20) {
                         sb.append(String.format("\\u%04x", (int) c));
                     } else {
                         sb.append(c);
                     }
-                }
+                    break;
             }
         }
         sb.append('"');
@@ -116,12 +128,16 @@ public final class SimpleJson {
 
         private Object valorInterno() {
             char c = actual();
-            return switch (c) {
-                case '{' -> objeto();
-                case '[' -> arreglo();
-                case '"' -> cadena();
-                default -> literal();
-            };
+            switch (c) {
+                case '{':
+                    return objeto();
+                case '[':
+                    return arreglo();
+                case '"':
+                    return cadena();
+                default:
+                    return literal();
+            }
         }
 
         private Map<String, Object> objeto() {
@@ -190,19 +206,36 @@ public final class SimpleJson {
                     posicion++;
                     char escape = texto.charAt(posicion);
                     switch (escape) {
-                        case '"' -> sb.append('"');
-                        case '\\' -> sb.append('\\');
-                        case '/' -> sb.append('/');
-                        case 'n' -> sb.append('\n');
-                        case 'r' -> sb.append('\r');
-                        case 't' -> sb.append('\t');
-                        case 'b' -> sb.append('\b');
-                        case 'f' -> sb.append('\f');
-                        case 'u' -> {
+                        case '"':
+                            sb.append('"');
+                            break;
+                        case '\\':
+                            sb.append('\\');
+                            break;
+                        case '/':
+                            sb.append('/');
+                            break;
+                        case 'n':
+                            sb.append('\n');
+                            break;
+                        case 'r':
+                            sb.append('\r');
+                            break;
+                        case 't':
+                            sb.append('\t');
+                            break;
+                        case 'b':
+                            sb.append('\b');
+                            break;
+                        case 'f':
+                            sb.append('\f');
+                            break;
+                        case 'u':
                             sb.append((char) Integer.parseInt(texto.substring(posicion + 1, posicion + 5), 16));
                             posicion += 4;
-                        }
-                        default -> throw new IllegalArgumentException("Escape JSON invalido");
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Escape JSON invalido");
                     }
                     posicion++;
                 } else {
@@ -218,11 +251,9 @@ public final class SimpleJson {
                 posicion++;
             }
             String token = texto.substring(inicio, posicion);
-            switch (token) {
-                case "true": return Boolean.TRUE;
-                case "false": return Boolean.FALSE;
-                case "null": return null;
-            }
+            if ("true".equals(token)) return Boolean.TRUE;
+            if ("false".equals(token)) return Boolean.FALSE;
+            if ("null".equals(token)) return null;
             try {
                 if (token.indexOf('.') >= 0 || token.indexOf('e') >= 0 || token.indexOf('E') >= 0) {
                     return Double.parseDouble(token);

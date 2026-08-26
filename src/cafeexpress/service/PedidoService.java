@@ -9,6 +9,10 @@ import cafeexpress.repository.PedidoRepository;
 import cafeexpress.repository.ProductoRepository;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -18,13 +22,17 @@ public class PedidoService {
 
     public static final double MONTO_MINIMO_TARJETA = 5000;
 
-    private static final Map<EstadoPedido, Set<EstadoPedido>> TRANSICIONES = Map.of(
-            EstadoPedido.RECIBIDO, Set.of(EstadoPedido.EN_PREPARACION, EstadoPedido.CANCELADO),
-            EstadoPedido.EN_PREPARACION, Set.of(EstadoPedido.LISTO, EstadoPedido.CANCELADO),
-            EstadoPedido.LISTO, Set.of(EstadoPedido.ENTREGADO),
-            EstadoPedido.ENTREGADO, Set.of(),
-            EstadoPedido.CANCELADO, Set.of()
-    );
+    private static final Map<EstadoPedido, Set<EstadoPedido>> TRANSICIONES;
+
+    static {
+        Map<EstadoPedido, Set<EstadoPedido>> t = new HashMap<>();
+        t.put(EstadoPedido.RECIBIDO, Collections.unmodifiableSet(new HashSet<>(Arrays.asList(EstadoPedido.EN_PREPARACION, EstadoPedido.CANCELADO))));
+        t.put(EstadoPedido.EN_PREPARACION, Collections.unmodifiableSet(new HashSet<>(Arrays.asList(EstadoPedido.LISTO, EstadoPedido.CANCELADO))));
+        t.put(EstadoPedido.LISTO, Collections.singleton(EstadoPedido.ENTREGADO));
+        t.put(EstadoPedido.ENTREGADO, Collections.emptySet());
+        t.put(EstadoPedido.CANCELADO, Collections.emptySet());
+        TRANSICIONES = Collections.unmodifiableMap(t);
+    }
 
     private final PedidoRepository repositorioPedidos;
     private final ProductoRepository repositorioProductos;
@@ -42,7 +50,7 @@ public class PedidoService {
     }
 
     public Pedido crear(String cliente, String formaPagoTexto, List<ItemSolicitado> items) {
-        if (cliente == null || cliente.isBlank()) {
+        if (cliente == null || cliente.trim().isEmpty()) {
             throw new ReglaNegocioException("El nombre del cliente es obligatorio");
         }
         if (items == null || items.isEmpty()) {
@@ -54,16 +62,16 @@ public class PedidoService {
         pedido.setFormaPago(formaPago);
 
         for (ItemSolicitado item : items) {
-            if (item.cantidad() <= 0) {
-                throw new ReglaNegocioException("La cantidad del producto " + item.productoId() + " debe ser mayor a cero");
+            if (item.getCantidad() <= 0) {
+                throw new ReglaNegocioException("La cantidad del producto " + item.getProductoId() + " debe ser mayor a cero");
             }
-            Producto producto = repositorioProductos.buscarPorId(item.productoId())
-                    .orElseThrow(() -> new ReglaNegocioException("El producto " + item.productoId() + " no existe"));
+            Producto producto = repositorioProductos.buscarPorId(item.getProductoId())
+                    .orElseThrow(() -> new ReglaNegocioException("El producto " + item.getProductoId() + " no existe"));
             if (!producto.isDisponible()) {
                 throw new ReglaNegocioException("El producto '" + producto.getNombre() + "' no esta disponible");
             }
             pedido.agregarDetalle(new DetallePedido(producto.getId(), producto.getNombre(),
-                    producto.getPrecio(), item.cantidad()));
+                    producto.getPrecio(), item.getCantidad()));
         }
 
         if (pedido.getTotal() < MONTO_MINIMO_TARJETA && formaPago == FormaPago.TARJETA) {
@@ -96,7 +104,7 @@ public class PedidoService {
     }
 
     private FormaPago leerFormaPago(String texto) {
-        if (texto == null || texto.isBlank()) {
+        if (texto == null || texto.trim().isEmpty()) {
             return FormaPago.EFECTIVO;
         }
         try {

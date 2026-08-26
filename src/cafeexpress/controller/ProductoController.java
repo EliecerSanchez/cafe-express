@@ -10,6 +10,7 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +34,21 @@ public class ProductoController implements HttpHandler {
             boolean conId = ruta.length() > PREFIJO.length();
 
             switch (metodo) {
-                case "GET" -> obtener(exchange, conId ? Http.idDeLaRuta(ruta, PREFIJO + "/") : null);
-                case "POST" -> crear(exchange);
-                case "PUT" -> actualizar(exchange, Http.idDeLaRuta(ruta, PREFIJO + "/"));
-                case "DELETE" -> eliminar(exchange, Http.idDeLaRuta(ruta, PREFIJO + "/"));
-                default -> Http.error(exchange, 405, "Metodo no permitido");
+                case "GET":
+                    obtener(exchange, conId ? Http.idDeLaRuta(ruta, PREFIJO + "/") : null);
+                    break;
+                case "POST":
+                    crear(exchange);
+                    break;
+                case "PUT":
+                    actualizar(exchange, Http.idDeLaRuta(ruta, PREFIJO + "/"));
+                    break;
+                case "DELETE":
+                    eliminar(exchange, Http.idDeLaRuta(ruta, PREFIJO + "/"));
+                    break;
+                default:
+                    Http.error(exchange, 405, "Metodo no permitido");
+                    break;
             }
         } catch (IllegalArgumentException e) {
             Http.error(exchange, 400, e.getMessage());
@@ -92,7 +103,7 @@ public class ProductoController implements HttpHandler {
             return;
         }
         if (servicio.eliminar(id)) {
-            Http.ok(exchange, Map.of("eliminado", id));
+            Http.ok(exchange, Collections.singletonMap("eliminado", id));
         } else {
             Http.error(exchange, 404, "El producto " + id + " no existe");
         }
@@ -113,8 +124,8 @@ public class ProductoController implements HttpHandler {
     }
 
     private double numero(Object valor) {
-        if (valor instanceof Number n) {
-            return n.doubleValue();
+        if (valor instanceof Number) {
+            return ((Number) valor).doubleValue();
         }
         return Double.parseDouble(String.valueOf(valor));
     }

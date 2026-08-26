@@ -35,10 +35,18 @@ public class PedidoController implements HttpHandler {
             String ruta = exchange.getRequestURI().getPath();
 
             switch (metodo) {
-                case "GET" -> consultar(exchange, ruta);
-                case "POST" -> crear(exchange);
-                case "PUT" -> actualizarEstado(exchange, ruta);
-                default -> Http.error(exchange, 405, "Metodo no permitido");
+                case "GET":
+                    consultar(exchange, ruta);
+                    break;
+                case "POST":
+                    crear(exchange);
+                    break;
+                case "PUT":
+                    actualizarEstado(exchange, ruta);
+                    break;
+                default:
+                    Http.error(exchange, 405, "Metodo no permitido");
+                    break;
             }
         } catch (IllegalArgumentException e) {
             Http.error(exchange, 400, e.getMessage());
@@ -49,6 +57,7 @@ public class PedidoController implements HttpHandler {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void consultar(HttpExchange exchange, String ruta) throws IOException {
         if (ruta.length() > PREFIJO.length()) {
             int id = Http.idDeLaRuta(ruta, PREFIJO + "/");
@@ -66,11 +75,13 @@ public class PedidoController implements HttpHandler {
         Http.ok(exchange, datos);
     }
 
+    @SuppressWarnings("unchecked")
     private void crear(HttpExchange exchange) throws IOException {
         Map<String, Object> cuerpo = SimpleJson.parse(Http.leerCuerpo(exchange));
         List<ItemSolicitado> items = new ArrayList<>();
         Object crudo = cuerpo.get("items");
-        if (crudo instanceof List<?> lista) {
+        if (crudo instanceof List) {
+            List<?> lista = (List<?>) crudo;
             for (Object elemento : lista) {
                 Map<String, Object> item = (Map<String, Object>) elemento;
                 items.add(new ItemSolicitado(
@@ -121,8 +132,8 @@ public class PedidoController implements HttpHandler {
     }
 
     private double doble(Object valor) {
-        if (valor instanceof Number n) {
-            return n.doubleValue();
+        if (valor instanceof Number) {
+            return ((Number) valor).doubleValue();
         }
         return Double.parseDouble(String.valueOf(valor));
     }

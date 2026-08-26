@@ -6,6 +6,7 @@ import cafeexpress.repository.ProductoRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ProductoService {
 
@@ -20,7 +21,7 @@ public class ProductoService {
     }
 
     public List<Producto> listarDisponibles() {
-        return repositorio.listar().stream().filter(Producto::isDisponible).toList();
+        return repositorio.listar().stream().filter(Producto::isDisponible).collect(Collectors.toList());
     }
 
     public Producto buscar(int id) {
@@ -51,7 +52,7 @@ public class ProductoService {
     }
 
     private void validarNombre(String nombre) {
-        if (nombre == null || nombre.isBlank()) {
+        if (nombre == null || nombre.trim().isEmpty()) {
             throw new ReglaNegocioException("El nombre del producto es obligatorio");
         }
     }
