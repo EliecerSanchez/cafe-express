@@ -1,36 +1,54 @@
 package cafeexpress.domain;
 
-public class DetallePedido {
+import org.junit.jupiter.api.Test;
 
-    private final int productoId;
-    private final String nombreProducto;
-    private final double precioUnitario;
-    private final int cantidad;
+import java.time.LocalDateTime;
 
-    public DetallePedido(int productoId, String nombreProducto, double precioUnitario, int cantidad) {
-        this.productoId = productoId;
-        this.nombreProducto = nombreProducto;
-        this.precioUnitario = precioUnitario;
-        this.cantidad = cantidad;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class PedidoTest {
+
+    @Test
+    void debeCalcularSubtotalDelPedido() {
+
+        Pedido pedido = new Pedido(
+                1,
+                "Juan Perez",
+                LocalDateTime.now()
+        );
+
+        DetallePedido detalle = new DetallePedido(
+                1,
+                "Cafe Americano",
+                5000,
+                2
+        );
+
+        pedido.agregarDetalle(detalle);
+
+        assertEquals(10000, pedido.getSubtotal());
     }
 
-    public int getProductoId() {
-        return productoId;
-    }
+    @Test
+    void debeAplicarDescuentoAlPedido() {
 
-    public String getNombreProducto() {
-        return nombreProducto;
-    }
+        Pedido pedido = new Pedido(
+                2,
+                "Maria Lopez",
+                LocalDateTime.now()
+        );
 
-    public double getPrecioUnitario() {
-        return precioUnitario;
-    }
+        DetallePedido detalle = new DetallePedido(
+                2,
+                "Capuchino",
+                8000,
+                2
+        );
 
-    public int getCantidad() {
-        return cantidad;
-    }
+        pedido.agregarDetalle(detalle);
 
-    public double getSubtotal() {
-        return Math.round(precioUnitario * cantidad * 100.0) / 100.0;
+        pedido.aplicarDescuento(2000);
+
+        assertEquals(14000, pedido.getTotal());
     }
 }
